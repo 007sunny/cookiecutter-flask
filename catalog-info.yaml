@@ -1,0 +1,10 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: cookiecutter-flask
+  annotations:
+    github.com/project-slug: 007sunny/cookiecutter-flask
+spec:
+  type: other
+  lifecycle: unknown
+  owner: team-a
