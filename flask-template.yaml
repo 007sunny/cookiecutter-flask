@@ -1,0 +1,32 @@
+apiVersion: backstage.io/v1alpha1
+kind: Template
+metadata:
+  name: flask-template
+  title: Flask Microservice Template
+  description: Create a microservice based off the Python Flask Framework
+  tags:
+    - recommended
+    - python
+    - flask
+spec:
+  owner: engineering@icanbwell.com
+  templater: cookiecutter
+  type: service
+  path: '.'
+  schema:
+    required:
+      - component_id
+      - description
+    properties:
+      component_id:
+        title: Name
+        type: string
+        description: Unique name of the service
+      description:
+        title: Description
+        type: string
+        description: Help others understand what the domain of this service is.
+      app_name:
+        title: App name
+        type: string
+        description: Name of your app
