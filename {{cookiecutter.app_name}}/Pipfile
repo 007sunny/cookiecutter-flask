@@ -17,11 +17,6 @@ psycopg2-binary = "==2.8.6"
 # Migrations
 Flask-Migrate = "==2.7.0"
 
-# Forms
-email-validator = "==1.1.2"
-Flask-WTF = "==0.14.3"
-WTForms = "==2.3.3"
-
 # Deployment
 gevent = "==21.1.2"
 gunicorn = ">=19.1.1"

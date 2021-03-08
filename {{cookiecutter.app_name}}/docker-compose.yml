@@ -2,12 +2,10 @@ version: "3.6"
 
 x-build-args: &build_args
   INSTALL_PYTHON_VERSION: {{cookiecutter.python_version}}
-  INSTALL_NODE_VERSION: {{cookiecutter.node_version}}
 
 x-default-volumes: &default_volumes
   volumes:
     - ./:/app
-    - node-modules:/app/node_modules
     - ./dev.db:/tmp/dev.db
 
 services:
@@ -45,7 +43,7 @@ services:
       target: development
       args:
         <<: *build_args
-    entrypoint: {% if cookiecutter.use_pipenv == 'True' %}pipenv run {% endif %}flask
+    entrypoint: pipenv run flask
     environment:
       FLASK_ENV: production
       FLASK_DEBUG: 0
@@ -54,5 +52,3 @@ services:
     tty: true
     <<: *default_volumes
 
-volumes:
-  node-modules:
