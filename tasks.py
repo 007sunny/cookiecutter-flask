@@ -12,12 +12,6 @@ COOKIE = os.path.join(HERE, DEFAULT_APP_NAME)
 REQUIREMENTS = os.path.join(COOKIE, "requirements", "dev.txt")
 
 
-def _run_npm_command(ctx, command):
-    os.chdir(COOKIE)
-    ctx.run(f"npm {command}", echo=True)
-    os.chdir(HERE)
-
-
 def _run_flask_command(ctx, command, *args):
     os.chdir(COOKIE)
     flask_command = f"flask {command}"
