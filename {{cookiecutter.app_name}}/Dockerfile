@@ -7,7 +7,7 @@ WORKDIR /app
 
 COPY ["Pipfile", "auto_pipenv.sh", "./"]
 RUN pip install --no-cache pipenv
-RUN pipenv install
+RUN pipenv install --pre
 
 COPY {{cookiecutter.app_name}} {{cookiecutter.app_name}}
 COPY .env.example .env
@@ -26,7 +26,7 @@ COPY --from=builder --chown=sid:sid /app/{{ cookiecutter.app_name }}/static /app
 
 COPY ["Pipfile", "auto_pipenv.sh", "./"]
 RUN pip install --no-cache pipenv
-RUN pipenv install
+RUN pipenv install --pre
 
 COPY supervisord.conf /etc/supervisor/supervisord.conf
 COPY supervisord_programs /etc/supervisor/conf.d
@@ -41,7 +41,7 @@ CMD ["-c", "/etc/supervisor/supervisord.conf"]
 # ================================= DEVELOPMENT ================================
 FROM builder AS development
 
-RUN pipenv install --dev
+RUN pipenv install --dev --pre
 EXPOSE 2992
 EXPOSE 5000
-CMD [ "pipenv", "run"]
+CMD ["pipenv", "run", "ddtrace-run", "flask", "run"]

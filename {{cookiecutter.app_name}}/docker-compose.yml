@@ -1,7 +1,7 @@
 version: "3.6"
 
 x-build-args: &build_args
-  INSTALL_PYTHON_VERSION: {{cookiecutter.python_version}}
+  INSTALL_PYTHON_VERSION: 3.7.5
 
 x-default-volumes: &default_volumes
   volumes:
@@ -16,6 +16,13 @@ services:
       args:
         <<: *build_args
     image: "{{cookiecutter.app_name}}-development"
+    environment:
+      DD_ENV: local
+      DD_SERVICE: {{cookiecutter.app_name}}
+      DD_VERSION: 1.0
+      DD_LOGS_INJECTION: "true"
+      LOG_LEVEL: info
+      FLASK_ENV: development
     ports:
       - "5000:5000"
       - "2992:2992"

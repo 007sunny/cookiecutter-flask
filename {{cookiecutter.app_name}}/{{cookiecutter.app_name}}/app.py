@@ -4,18 +4,45 @@ import logging
 import sys
 
 from flask import Flask, render_template
+from pythonjsonlogger import jsonlogger
 
-from {{cookiecutter.app_name}} import commands, public, user
+from {{cookiecutter.app_name}} import commands, app1, logger
 from {{cookiecutter.app_name}}.extensions import (
     bcrypt,
     cache,
-    csrf_protect,
     db,
     debug_toolbar,
     flask_static_digest,
-    login_manager,
     migrate,
 )
+from opentelemetry import trace
+from opentelemetry.exporter.datadog import (
+    DatadogExportSpanProcessor,
+    DatadogSpanExporter,
+)
+from opentelemetry.instrumentation.flask import FlaskInstrumentor
+from opentelemetry.instrumentation.requests import RequestsInstrumentor
+from opentelemetry.sdk.trace import TracerProvider
+
+app = Flask(__name__)
+FlaskInstrumentor().instrument_app(app)
+RequestsInstrumentor().instrument()
+
+
+trace.set_tracer_provider(TracerProvider())
+trace.get_tracer_provider().add_span_processor(
+    DatadogExportSpanProcessor(
+        DatadogSpanExporter(
+            agent_url="http://127.0.0.1:8126/", service="dd_tracing_example"
+        )
+    )
+)
+tracer = trace.get_tracer(__name__)
+
+with tracer.start_as_current_span("span_1"):
+    with tracer.start_as_current_span("span_2"):
+        with tracer.start_as_current_span("span_3"):
+            print("Hello world from {{cookiecutter.app_name}}!")
 
 
 def create_app(config_object="{{cookiecutter.app_name}}.settings"):
@@ -39,8 +66,6 @@ def register_extensions(app):
     bcrypt.init_app(app)
     cache.init_app(app)
     db.init_app(app)
-    csrf_protect.init_app(app)
-    login_manager.init_app(app)
     debug_toolbar.init_app(app)
     migrate.init_app(app, db)
     flask_static_digest.init_app(app)
@@ -49,8 +74,7 @@ def register_extensions(app):
 
 def register_blueprints(app):
     """Register Flask blueprints."""
-    app.register_blueprint(public.views.blueprint)
-    app.register_blueprint(user.views.blueprint)
+    app.register_blueprint(app1.views.blueprint)
     return None
 
 
@@ -73,7 +97,7 @@ def register_shellcontext(app):
 
     def shell_context():
         """Shell context objects."""
-        return {"db": db, "User": user.models.User}
+        return {}
 
     app.shell_context_processor(shell_context)
 
@@ -86,6 +110,8 @@ def register_commands(app):
 
 def configure_logger(app):
     """Configure loggers."""
-    handler = logging.StreamHandler(sys.stdout)
-    if not app.logger.handlers:
-        app.logger.addHandler(handler)
+    handler = logging.FileHandler(filename='<LOG_FILE_PATH>')
+    formatter = logger.formatter
+    handler.setFormatter(formatter)
+    app.logger.addHandler(handler)
+
